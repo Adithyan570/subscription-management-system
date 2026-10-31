@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --color-ink: #16202a;
+  --color-mute: #5b6978;
+  --color-line: #dce1e7;
+  --color-wash: #f1f3f6;
+  --color-brand: #2f4bdb;
+  --color-brand-dark: #2239b3;
+  --color-brand-tint: #e8ecfd;
+  --color-paid: #14805a;
+  --color-paid-tint: #e1f3ec;
+  --color-late: #b93d0a;
+  --color-late-tint: #fbebe3;
+  --color-amber-tint: #fbf3dc;
+}
+
+body { background: var(--color-wash); color: var(--color-ink); font-family: var(--font-sans); font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
