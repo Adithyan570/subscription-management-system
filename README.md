@@ -1,6 +1,6 @@
 subscription-management-system
 
-fOR evaluators 
+for evaluators 
 backend runs :
       # Terminal 1
 cd backend
