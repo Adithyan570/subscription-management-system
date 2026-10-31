@@ -1,44 +1,6 @@
 # Subscription Management System
 
-FastAPI + SQLAlchemy (SQLite) backend, React + Vite + Tailwind frontend.
-Plans, subscriptions, automatic recurring billing, discounts, payments and a finance dashboard, with three roles: **admin**, **internal staff** and **customer**.
-
-## Run it
-
-**Backend** (Python 3.10+)
-
-```bash
-cd backend
-python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-python seed.py                    # optional demo data; add  --bulk 3000  to load thousands of records
-uvicorn app.main:app --reload     # http://localhost:8000  (API docs at /docs)
-```
-
-**Frontend** (Node 18+)
-
-```bash
-cd frontend
-npm install
-npm run dev                       # http://localhost:5173  (proxies /api to :8000)
-```
-
-**Sign in**
-
-| Role | Email | Password |
-| --- | --- | --- |
-| Admin (created on first start) | admin@example.com | Admin@1234 |
-| Staff (from seed.py) | staff@example.com | Staff@1234 |
-| Customer (from seed.py) | customer@example.com | Cust@12345 |
-
-Change the admin password and set `SECRET_KEY` before deploying (see `backend/.env.example`).
-
-Run the tests: `cd backend && python -m pytest`
-
-## Email: password reset and invoices
-
-Forgot password sends the user an email with a one-time link (valid 60 minutes) to the address they entered.
-The same mailer sends invoices from the invoice screen (*Send to customer*).
+end to customer*).
 
 1. **Dev mode (default)**: with no email settings the message is printed in the backend console and saved in `backend/outbox/`. Nothing is delivered.
 2. **Local test mail server**: run `python dev_mail_server.py` in a second terminal, and put `SMTP_HOST=127.0.0.1`, `SMTP_PORT=1025`, `SMTP_SECURITY=none` in `backend/.env`. Emails then arrive in that terminal and in `backend/mailbox/`. Good for checking the whole flow without an account.
