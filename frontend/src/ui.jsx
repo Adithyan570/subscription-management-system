@@ -148,3 +148,26 @@ export function useDebounced(value, ms = 300) {
   useEffect(() => { const t = setTimeout(() => setV(value), ms); return () => clearTimeout(t) }, [value, ms])
   return v
 }
+
+const RULES = [
+  ['More than 8 characters', (p) => p.length > 8],
+  ['An uppercase letter', (p) => /[A-Z]/.test(p)],
+  ['A lowercase letter', (p) => /[a-z]/.test(p)],
+  ['A special character, like @ # ! $', (p) => /[^A-Za-z0-9]/.test(p)],
+]
+export const passwordIsValid = (p = '') => RULES.every(([, ok]) => ok(p))
+export function PasswordRules({ value = '' }) {
+  return (
+    <ul className="mt-1.5 space-y-0.5 text-xs" aria-label="Password rules">
+      {RULES.map(([label, ok]) => {
+        const good = ok(value)
+        return (
+          <li key={label} className={good ? 'text-paid' : 'text-mute'}>
+            <span aria-hidden="true">{good ? '✓' : '○'}</span> {label}
+            <span className="sr-only">{good ? ' (met)' : ' (not met yet)'}</span>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}

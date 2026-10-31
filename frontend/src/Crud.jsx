@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { api } from './api'
-import { Btn, Field, Modal, Notice, PageHead, Table, bustOptions, inputCls } from './ui'
+import { Btn, Field, Modal, Notice, PageHead, PasswordRules, Table, bustOptions, inputCls } from './ui'
 import { LinesEditor, OptionSelect, VariantsEditor, cleanLines } from './Editors'
 
 function initial(fields, row) {
@@ -101,6 +101,8 @@ function FormModal({ title, fields, row, onClose, onSave }) {
   const [vals, setVals] = useState(() => initial(fields, row))
   const [err, setErr] = useState('')
   const [busy, setBusy] = useState(false)
+  const errRef = useRef(null)
+  useEffect(() => { err && errRef.current?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' }) }, [err])
   const visible = fields.filter((f) => !(row && f.createOnly))
   const submit = async (e) => {
     e.preventDefault()
@@ -113,9 +115,8 @@ function FormModal({ title, fields, row, onClose, onSave }) {
   return (
     <Modal title={title} onClose={onClose} wide={fields.some((f) => f.type === 'variants' || f.type === 'lines')}>
       <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-        <div className="sm:col-span-2"><Notice>{err}</Notice></div>
         {visible.map((f) => (
-          <Field key={f.name} label={f.label} hint={f.hint} className={f.wide || f.type === 'variants' || f.type === 'lines' || f.type === 'textarea' ? 'sm:col-span-2' : f.type === 'checkbox' ? 'flex items-center gap-2 sm:col-span-1' : ''}>
+          <Field key={f.name} label={f.label} hint={f.type === 'password' ? <PasswordRules value={vals[f.name]} /> : f.hint} className={f.wide || f.type === 'variants' || f.type === 'lines' || f.type === 'textarea' ? 'sm:col-span-2' : f.type === 'checkbox' ? 'flex items-center gap-2 sm:col-span-1' : ''}>
             {f.type === 'checkbox' ? (
               <span className="flex items-center gap-2"><FieldInput f={f} value={vals[f.name]} onChange={(v) => setVals({ ...vals, [f.name]: v })} /><span className="text-sm text-mute">{f.hint}</span></span>
             ) : (
@@ -123,6 +124,7 @@ function FormModal({ title, fields, row, onClose, onSave }) {
             )}
           </Field>
         ))}
+        <div className="sm:col-span-2">{err && <div ref={errRef}><Notice>{err}</Notice></div>}</div>
         <div className="flex justify-end gap-2 sm:col-span-2">
           <Btn onClick={onClose}>Cancel</Btn>
           <button type="submit" disabled={busy} className="rounded-md bg-brand px-3.5 py-2 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-50">{busy ? 'Saving…' : 'Save'}</button>

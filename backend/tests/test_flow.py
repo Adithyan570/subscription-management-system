@@ -123,3 +123,11 @@ def test_plan_rules_and_reset(c, capsys):
     assert c.post("/api/auth/reset-password", json={"token": token, "password": "New#Passw0rd"}).status_code == 200
     assert c.post("/api/auth/reset-password", json={"token": token, "password": "New#Passw0rd"}).status_code == 400
     login(c, "a@x.com", "New#Passw0rd")
+
+
+def test_lenient_email_and_forgot_sends_mail(c, capsys):
+    assert c.post("/api/auth/register", json={"email": "Dana@Shop.local", "password": PW}).status_code == 201
+    assert c.post("/api/auth/register", json={"email": "not-an-email", "password": PW}).status_code == 422
+    assert c.post("/api/auth/forgot-password", json={"email": "dana@shop.local"}).status_code == 200
+    out = capsys.readouterr().out
+    assert "reset-password?token=" in out and "To: dana@shop.local" in out

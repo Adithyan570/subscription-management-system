@@ -95,9 +95,11 @@ def send_invoice(iid: int, db: Session = Depends(get_db)):
         raise HTTPException(404, "Invoice not found.")
     if inv.status not in ("confirmed", "paid"):
         raise HTTPException(409, "Confirm the invoice before sending it.")
-    send_email(inv.customer.email, f"Invoice {inv.number}",
+    ok = send_email(inv.customer.email, f"Invoice {inv.number}",
                f"Hello {inv.customer_name},\n\nInvoice {inv.number} for {inv.total:.2f} "
                f"is due on {inv.due_date}.\nPeriod: {inv.period_start} to {inv.period_end}.\n\nThank you.")
+    if not ok:
+        raise HTTPException(502, "The email server rejected or couldn't send this message. Check the SMTP settings.")
     inv.sent_at = utcnow()
     db.commit()
     return inv

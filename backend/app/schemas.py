@@ -1,7 +1,21 @@
 from datetime import date, datetime
-from typing import Literal
+import re
+from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field
+
+_EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s.]+$")
+
+
+def _clean_email(v: str) -> str:
+    v = v.strip().lower()
+    if len(v) > 254 or not _EMAIL.match(v):
+        raise ValueError("Enter a valid email address, like name@company.com.")
+    return v
+
+
+# Deliberately lenient: also accepts dev-style domains such as name@company.local
+EmailStr = Annotated[str, AfterValidator(_clean_email)]
 
 
 class ORM(BaseModel):

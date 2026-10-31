@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -46,7 +46,7 @@ def me(user: User = Depends(current_user)):
 
 
 @router.post("/forgot-password")
-def forgot_password(body: ForgotIn, db: Session = Depends(get_db)):
+def forgot_password(body: ForgotIn, background: BackgroundTasks, db: Session = Depends(get_db)):
     user = db.scalar(select(User).where(func.lower(User.email) == body.email.lower()))
     if user and user.is_active:
         raw, hashed = new_reset_token()
@@ -54,8 +54,18 @@ def forgot_password(body: ForgotIn, db: Session = Depends(get_db)):
                              expires_at=utcnow() + timedelta(minutes=config.RESET_MINUTES)))
         db.commit()
         link = f"{config.FRONTEND_URL}/reset-password?token={raw}"
-        send_email(user.email, "Reset your password",
-                   f"Use this link to choose a new password (valid {config.RESET_MINUTES} minutes):\n\n{link}")
+        who = user.name or "there"
+        text = (f"Hi {who},\n\nWe received a request to reset the password for your {config.APP_NAME} account.\n"
+                f"Open this link to choose a new password (valid for {config.RESET_MINUTES} minutes, works once):\n\n"
+                f"{link}\n\nIf you didn't ask for this, you can ignore this email. Your password won't change.\n")
+        html = (f"<p>Hi {who},</p><p>We received a request to reset the password for your {config.APP_NAME} account.</p>"
+                f'<p><a href="{link}" style="background:#2f4bdb;color:#fff;padding:10px 16px;border-radius:6px;'
+                f'text-decoration:none">Choose a new password</a></p>'
+                f"<p>Or paste this link into your browser:<br>{link}</p>"
+                f"<p>The link is valid for {config.RESET_MINUTES} minutes and works once. "
+                f"If you didn't ask for this, ignore this email.</p>")
+        # sent after the response, so a slow mail server never delays the page and failures stay in the server log
+        background.add_task(send_email, user.email, f"Reset your {config.APP_NAME} password", text, html)
     # same answer either way, so the endpoint can't be used to discover registered emails
     return {"message": "If that email is registered, a reset link is on its way."}
 

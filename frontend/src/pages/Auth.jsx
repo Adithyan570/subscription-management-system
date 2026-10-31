@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api'
 import { useAuth } from '../auth'
-import { Field, Notice, inputCls } from '../ui'
+import { Field, Notice, PasswordRules, inputCls } from '../ui'
 
 function Shell({ title, children, foot }) {
   return (
@@ -21,7 +21,6 @@ const Submit = ({ busy, children }) => (
   <button disabled={busy} className="w-full rounded-md bg-brand px-3.5 py-2.5 text-sm font-medium text-white hover:bg-brand-dark disabled:opacity-50">{busy ? 'Please wait…' : children}</button>
 )
 
-const RULES = 'More than 8 characters, with an uppercase letter, a lowercase letter and a special character.'
 
 export function Login() {
   const { user, login } = useAuth()
@@ -59,7 +58,7 @@ export function Register() {
         <Notice>{err}</Notice>
         <Field label="Name"><input className={inputCls} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} /></Field>
         <Field label="Email"><input className={inputCls} type="email" required autoComplete="username" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} /></Field>
-        <Field label="Password" hint={RULES}><input className={inputCls} type="password" required autoComplete="new-password" value={f.pw} onChange={(e) => setF({ ...f, pw: e.target.value })} /></Field>
+        <Field label="Password" hint={<PasswordRules value={f.pw} />}><input className={inputCls} type="password" required autoComplete="new-password" value={f.pw} onChange={(e) => setF({ ...f, pw: e.target.value })} /></Field>
         <Submit busy={busy}>Create account</Submit>
       </form>
     </Shell>
@@ -95,7 +94,7 @@ export function Reset() {
     <Shell title="Choose a new password" foot={<Link className="text-brand" to="/login">Back to sign in</Link>}>
       <form onSubmit={go} className="space-y-4">
         <Notice>{err}</Notice><Notice kind="ok">{done && 'Password updated. Taking you to sign in…'}</Notice>
-        <Field label="New password" hint={RULES}><input className={inputCls} type="password" required autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} /></Field>
+        <Field label="New password" hint={<PasswordRules value={pw} />}><input className={inputCls} type="password" required autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} /></Field>
         <Submit>Update password</Submit>
       </form>
     </Shell>

@@ -103,7 +103,7 @@ export function Customers() {
     fixed={{ role: 'customer' }} sub="Accounts that can sign in to the self-service portal."
     columns={[{ label: 'Name', render: person }, { label: 'Email', key: 'email' }, { label: 'Active', render: (r) => yesNo(r.is_active) }]}
     fields={[{ name: 'name', label: 'Name' }, { name: 'email', label: 'Email', type: 'email', required: true, createOnly: true },
-             { name: 'password', label: 'Temporary password', type: 'password', required: true, createOnly: true, hint: 'More than 8 characters with upper, lower and a special character. The customer can reset it later.' },
+             { name: 'password', label: 'Temporary password', type: 'password', required: true, createOnly: true },
              { name: 'is_active', label: 'Active', type: 'checkbox', default: true }]} />
 }
 
